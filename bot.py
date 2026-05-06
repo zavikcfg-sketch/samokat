@@ -71,10 +71,10 @@ def init_db() -> None:
 def main_menu_keyboard() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(
         inline_keyboard=[
-            [InlineKeyboardButton(text="1) Аккаунт", callback_data="menu_account")],
-            [InlineKeyboardButton(text="2) Тарифы", callback_data="menu_tariffs")],
-            [InlineKeyboardButton(text="3) Подписки", callback_data="menu_subscriptions")],
-            [InlineKeyboardButton(text="4) Помощь", callback_data="menu_help")],
+            [InlineKeyboardButton(text="1) Аккаунт ✅", callback_data="menu_account")],
+            [InlineKeyboardButton(text="2) Тарифы 🛴", callback_data="menu_tariffs")],
+            [InlineKeyboardButton(text="3) Подписки 💵", callback_data="menu_subscriptions")],
+            [InlineKeyboardButton(text="4) Помощь 🆘", callback_data="menu_help")],
         ]
     )
 
