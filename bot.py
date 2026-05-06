@@ -37,14 +37,14 @@ class Product:
 
 
 PRODUCTS = {
-    "tariff_60": Product("tariff_60", "60 минут - 150 RUB", Decimal("150"), "tariffs"),
-    "tariff_60_duo": Product("tariff_60_duo", "60 минут (для тебя и друга) - 250 RUB", Decimal("250"), "tariffs"),
-    "tariff_120": Product("tariff_120", "120 минут - 300 RUB", Decimal("300"), "tariffs"),
-    "tariff_180": Product("tariff_180", "180 минут - 450 RUB", Decimal("450"), "tariffs"),
-    "tariff_300": Product("tariff_300", "300 минут - 600 RUB", Decimal("600"), "tariffs"),
-    "sub_day": Product("sub_day", "Подписка 1 день за 1 RUB - 500 RUB", Decimal("500"), "subscriptions"),
-    "sub_5days": Product("sub_5days", "Подписка 5 дней за 1 RUB - 1250 RUB", Decimal("1250"), "subscriptions"),
-    "sub_worker": Product("sub_worker", "Аккаунт работника (бесплатные поездки) - 3000 RUB", Decimal("3000"), "subscriptions"),
+    "tariff_60": Product("tariff_60", "60 минут · 150 RUB", Decimal("150"), "tariffs"),
+    "tariff_60_duo": Product("tariff_60_duo", "60 минут для двоих · 250 RUB", Decimal("250"), "tariffs"),
+    "tariff_120": Product("tariff_120", "120 минут · 300 RUB", Decimal("300"), "tariffs"),
+    "tariff_180": Product("tariff_180", "180 минут · 450 RUB", Decimal("450"), "tariffs"),
+    "tariff_300": Product("tariff_300", "300 минут · 600 RUB", Decimal("600"), "tariffs"),
+    "sub_day": Product("sub_day", "Подписка 1 день за 1 RUB · 500 RUB", Decimal("500"), "subscriptions"),
+    "sub_5days": Product("sub_5days", "Подписка 5 дней за 1 RUB · 1250 RUB", Decimal("1250"), "subscriptions"),
+    "sub_worker": Product("sub_worker", "Аккаунт работника (безлимит) · 3000 RUB", Decimal("3000"), "subscriptions"),
 }
 
 
@@ -71,10 +71,10 @@ def init_db() -> None:
 def main_menu_keyboard() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(
         inline_keyboard=[
-            [InlineKeyboardButton(text="1) Аккаунт ✅", callback_data="menu_account")],
-            [InlineKeyboardButton(text="2) Тарифы 🛴", callback_data="menu_tariffs")],
-            [InlineKeyboardButton(text="3) Подписки 💵", callback_data="menu_subscriptions")],
-            [InlineKeyboardButton(text="4) Помощь 🆘", callback_data="menu_help")],
+            [InlineKeyboardButton(text="👤 Аккаунт", callback_data="menu_account")],
+            [InlineKeyboardButton(text="🛴 Тарифы", callback_data="menu_tariffs")],
+            [InlineKeyboardButton(text="💎 Подписки", callback_data="menu_subscriptions")],
+            [InlineKeyboardButton(text="🆘 Помощь", callback_data="menu_help")],
         ]
     )
 
@@ -90,25 +90,25 @@ def products_keyboard(category: str) -> InlineKeyboardMarkup:
                     )
                 ]
             )
-    rows.append([InlineKeyboardButton(text="Назад", callback_data="menu_main")])
+    rows.append([InlineKeyboardButton(text="⬅️ Назад в меню", callback_data="menu_main")])
     return InlineKeyboardMarkup(inline_keyboard=rows)
 
 
 def payment_methods_keyboard(product_code: str) -> InlineKeyboardMarkup:
     rows = [
-        [InlineKeyboardButton(text="Оплата через ЮMoney", callback_data=f"pay_ym:{product_code}")]
+        [InlineKeyboardButton(text="💳 ЮMoney", callback_data=f"pay_ym:{product_code}")]
     ]
     if ENABLE_STARS:
-        rows.append([InlineKeyboardButton(text="Оплата Telegram Stars", callback_data=f"pay_stars:{product_code}")])
-    rows.append([InlineKeyboardButton(text="Назад", callback_data="menu_main")])
+        rows.append([InlineKeyboardButton(text="⭐ Telegram Stars", callback_data=f"pay_stars:{product_code}")])
+    rows.append([InlineKeyboardButton(text="⬅️ Назад в меню", callback_data="menu_main")])
     return InlineKeyboardMarkup(inline_keyboard=rows)
 
 
 def after_payment_keyboard(label: str) -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(
         inline_keyboard=[
-            [InlineKeyboardButton(text="Проверить оплату", callback_data=f"check:{label}")],
-            [InlineKeyboardButton(text="В главное меню", callback_data="menu_main")],
+            [InlineKeyboardButton(text="✅ Проверить оплату", callback_data=f"check:{label}")],
+            [InlineKeyboardButton(text="🏠 Главное меню", callback_data="menu_main")],
         ]
     )
 
@@ -201,15 +201,16 @@ def get_order(label: str):
 @router.message(CommandStart())
 async def start_handler(message: Message):
     text = (
-        "Добро пожаловать в бот промокодов для аренды самокатов.\n\n"
-        "Выберите раздел:"
+        "Привет! Это Scooter Promo Bot 🛴\n\n"
+        "Здесь вы можете быстро купить тариф или подписку и получить персональный промокод.\n\n"
+        "Выберите нужный раздел:"
     )
     await message.answer(text, reply_markup=main_menu_keyboard())
 
 
 @router.callback_query(F.data == "menu_main")
 async def menu_main(callback):
-    await callback.message.edit_text("Главное меню:", reply_markup=main_menu_keyboard())
+    await callback.message.edit_text("🏠 Главное меню", reply_markup=main_menu_keyboard())
     await callback.answer()
 
 
@@ -217,10 +218,10 @@ async def menu_main(callback):
 async def menu_account(callback):
     user = callback.from_user
     text = (
-        f"Ваш аккаунт:\n"
+        "👤 Ваш аккаунт\n\n"
         f"ID: {user.id}\n"
-        f"Username: @{user.username or 'нет'}\n\n"
-        "Покупки и промокоды привязаны к этому аккаунту."
+        f"Username: @{user.username or 'не указан'}\n\n"
+        "Все покупки и промокоды привязываются к этому профилю."
     )
     await callback.message.edit_text(text, reply_markup=main_menu_keyboard())
     await callback.answer()
@@ -229,12 +230,12 @@ async def menu_account(callback):
 @router.callback_query(F.data == "menu_help")
 async def menu_help(callback):
     text = (
-        "Помощь:\n"
+        "🆘 Как это работает\n\n"
         "1) Выберите тариф или подписку.\n"
-        "2) Оплатите заказ.\n"
-        "3) Нажмите 'Проверить оплату'.\n"
-        "4) Получите персональный промокод.\n\n"
-        "Если есть проблемы с оплатой, напишите администратору."
+        "2) Оплатите заказ удобным способом.\n"
+        "3) Нажмите кнопку «Проверить оплату».\n"
+        "4) Получите ваш персональный промокод.\n\n"
+        "Если оплата не подтверждается, попробуйте снова через 1-2 минуты."
     )
     await callback.message.edit_text(text, reply_markup=main_menu_keyboard())
     await callback.answer()
@@ -242,14 +243,14 @@ async def menu_help(callback):
 
 @router.callback_query(F.data == "menu_tariffs")
 async def menu_tariffs(callback):
-    await callback.message.edit_text("Тарифы:", reply_markup=products_keyboard("tariffs"))
+    await callback.message.edit_text("🛴 Тарифы", reply_markup=products_keyboard("tariffs"))
     await callback.answer()
 
 
 @router.callback_query(F.data == "menu_subscriptions")
 async def menu_subscriptions(callback):
     await callback.message.edit_text(
-        "Подписки:", reply_markup=products_keyboard("subscriptions")
+        "💎 Подписки", reply_markup=products_keyboard("subscriptions")
     )
     await callback.answer()
 
@@ -262,7 +263,7 @@ async def select_product(callback):
         await callback.answer("Товар не найден", show_alert=True)
         return
     text = (
-        f"Вы выбрали:\n{product.title}\n\n"
+        f"🧾 Вы выбрали:\n{product.title}\n\n"
         "Выберите способ оплаты:"
     )
     await callback.message.edit_text(
@@ -285,10 +286,11 @@ async def pay_yoomoney(callback):
     label = create_order(callback.from_user.id, callback.from_user.username, product)
     link = build_yoomoney_quickpay_link(label, product)
     text = (
-        f"Заказ создан: {product.title}\n"
+        "✅ Заказ создан\n\n"
+        f"Товар: {product.title}\n"
         f"Сумма: {product.amount_rub} RUB\n\n"
-        f"Оплатите по ссылке:\n{link}\n\n"
-        "После оплаты нажмите кнопку ниже."
+        f"Ссылка для оплаты:\n{link}\n\n"
+        "После оплаты нажмите «Проверить оплату»."
     )
     await callback.message.edit_text(text, reply_markup=after_payment_keyboard(label))
     await callback.answer()
@@ -302,9 +304,9 @@ async def pay_stars_info(callback):
         await callback.answer("Товар не найден", show_alert=True)
         return
     text = (
-        f"Telegram Stars для {product.title}.\n\n"
-        "В этом шаблоне Stars оставлен как опциональный режим.\n"
-        "Если хотите, можно добавить полноценный Telegram Invoice (XTR) под ваш регион."
+        f"⭐ Telegram Stars для позиции:\n{product.title}\n\n"
+        "Сейчас режим Stars работает как демонстрационный.\n"
+        "При необходимости можно подключить полноценный Telegram Invoice (XTR)."
     )
     await callback.message.edit_text(text, reply_markup=main_menu_keyboard())
     await callback.answer()
@@ -325,7 +327,7 @@ async def check_payment(callback):
 
     if status == "paid" and promo_code:
         await callback.message.edit_text(
-            f"Оплата уже подтверждена.\nВаш промокод: {promo_code}",
+            f"✅ Оплата уже подтверждена.\n\nВаш промокод: {promo_code}",
             reply_markup=main_menu_keyboard(),
         )
         await callback.answer()
@@ -344,10 +346,10 @@ async def check_payment(callback):
     product = PRODUCTS.get(product_code)
     product_title = product.title if product else product_code
     text = (
-        "Оплата подтверждена.\n"
+        "🎉 Оплата подтверждена\n"
         f"Товар: {product_title}\n"
         f"Ваш промокод: {promo}\n\n"
-        "Сохраните промокод. Он выдан только вам."
+        "Сохраните промокод: он выдан только для этого аккаунта."
     )
     await callback.message.edit_text(text, reply_markup=main_menu_keyboard())
     await callback.answer("Успешно")
